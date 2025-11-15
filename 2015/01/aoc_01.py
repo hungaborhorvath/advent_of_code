@@ -3,7 +3,7 @@
 
 import sys
 
-def floor_counter(input_data: str):
+def floor_counter(input_data: str) -> tuple[int, int]:
     s = 0
     counter = 0
     pos = 0
@@ -17,7 +17,7 @@ def floor_counter(input_data: str):
             pos = counter
     return (s, pos)
 
-def main(file_name: str) -> int:
+def main(file_name: str) -> tuple[int, int]:
     with open(file_name) as input_file:
         input_data = input_file.read()
     answer = floor_counter(input_data)
