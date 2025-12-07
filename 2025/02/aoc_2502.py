@@ -4,7 +4,7 @@
 import sys
 
 
-def parse_input(input_data: str) -> list[tuple[int], [int]]:
+def parse_input(input_data: str) -> list[tuple[int, int]]:
     ranges = []
     for range_string in input_data.split(','):
         ranges.append(tuple(int(n) for n in range_string.split('-')))

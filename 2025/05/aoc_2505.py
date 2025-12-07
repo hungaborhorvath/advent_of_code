@@ -31,7 +31,7 @@ def all_fresh_ids_slow(intervals:list[tuple[int, int]]) -> set[int]:
 
 
 def have_intersection_with(interval:tuple[int, int],
-                           intervals:list[tuple[int, int]]) -> list[tuple[int, int]]:
+                           intervals:set[tuple[int, int]]) -> list[tuple[int, int]]:
     (x, y) = interval
     has_intersection = set([])
     for (a, b) in intervals:
@@ -56,7 +56,7 @@ def add_new_interval(interval:tuple[int, int],
     return new_disjoint_intervals
 
 def all_disjoint_intervals(intervals:list[tuple[int, int]]) -> set[tuple[int, int]]:
-    all_intervals = set([])
+    all_intervals = set([]) # type:set[tuple[int, int]]
     for interval in intervals:
         all_intervals = add_new_interval(interval, all_intervals)
     return all_intervals

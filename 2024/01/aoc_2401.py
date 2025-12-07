@@ -3,8 +3,8 @@
 
 import sys
 
-def parse_input(input_data: str) -> list[list[int], list[int]]:
-    l = [[], []]
+def parse_input(input_data: str) -> list[list[int]]:
+    l = [[], []] # type:list[list[int]]
     merged_numbers = input_data.split()
     for i, nr in enumerate(merged_numbers):
         l[i%2].append(int(nr))
@@ -16,7 +16,7 @@ def differences(l1: list[int], l2: list[int]) -> list[int]:
         l.append(abs(a-b))
     return l
 
-def similarity_score(l1: list[int], l2: list[int]) -> list[int]:
+def similarity_score(l1: list[int], l2: list[int]) -> int:
     return sum(a*l2.count(a) for a in l1)
 
 def main(file_name: str):

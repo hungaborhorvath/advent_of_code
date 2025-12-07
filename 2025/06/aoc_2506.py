@@ -16,11 +16,11 @@ def parse_input_for_part_two(input_data:str) -> list[str]:
     return lines[:-1]
 
 
-def length_of_columns(columns:list[int]) -> list[int]:
+def length_of_columns(columns:list[list[int]]) -> list[int]:
     return [max([len(str(n)) for n in column]) for column in columns]
 
 def create_columns_for_second_part(number_lines:list[str],
-                                   lengths:list[int]) -> list[int]:
+                                   lengths:list[int]) -> list[list[int]]:
     columns = []
     start = 0
     for length in lengths:

@@ -21,7 +21,7 @@ def parse_input(input_data: str) -> list[int]:
         elif nr[0] == 'R':
             numbers.append(int(nr[1:]))
         else:
-            return WrongInputError(nr)
+            raise WrongInputError(nr)
     return numbers
 
 def dial_states(numbers:list[int], start:int =START,
@@ -34,7 +34,7 @@ def dial_states(numbers:list[int], start:int =START,
     return dial_sequence
 
 def number_of_zeros(numbers:list[int], start:int =START,
-                                       dial_size:int =DIAL_SIZE) -> list[int]:
+                                       dial_size:int =DIAL_SIZE) -> int:
     dial = start
     count_of_zeros = 0
     for n in numbers:

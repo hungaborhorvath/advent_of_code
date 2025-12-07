@@ -10,13 +10,13 @@ def parse_input(input_data: str) -> list[list[int]]:
     dimensions = [s.split('x') for s in dimensions_str if s]
     return [[int(s) for s in sides] for sides in dimensions]
 
-def wrapping_paper(sides: list[int]) -> bool:
+def wrapping_paper(sides: list[int]) -> int:
     surface = sum(2*a*b for a, b in itertools.combinations(sides, 2))
     sorted_sides = sorted(sides)
     slack = sorted_sides[0]*sorted_sides[1]
     return surface + slack
 
-def ribbon(sides: list[int]) -> bool:
+def ribbon(sides: list[int]) -> int:
     sorted_sides = sorted(sides)
     present = 2*(sorted_sides[0]+sorted_sides[1])
     bow = math.prod(sides)
