@@ -96,31 +96,14 @@ def v(t:tuple) -> sympy.Symbol:
     return sympy.Symbol('v_' + str(t), integer=True)
 
 
-## apparently this doesn't work, need to check with sympy devs
-def linear_program_for_joltage(
-        joltage:list[int],
-        all_buttons:list[tuple[int, ...]]
-        ) -> int:
-    x = [v(button) for button in all_buttons]
-    c = [1 for button in all_buttons]
-    A_eq = sympy.Matrix(matrix_for_buttons(joltage, all_buttons))
-    b_eq = joltage
-    bounds = {i: (0, max_press_for_button(joltage, button))
-              for (i, button) in enumerate(all_buttons)}
-    return sympy.solvers.linprog(c=c, A_eq=A_eq, b_eq=b_eq,
-                                 bounds=bounds)
-    
-
 def find_number_of_lowest_button_presses_for_joltage(
         joltage:list[int],
         all_buttons:list[tuple[int, ...]],
         use_heuristic=True,
         ) -> int:
-    x = [v(button) for button in all_buttons]
     variables = [v(button)
                  for button in sorted(all_buttons, key=len, reverse=True)]
-    expression = sum(x)
-    c = sympy.linear_eq_to_matrix(expression, x)[0]
+    expression = sum(variables)
     equations = []
     for i, jolt in enumerate(joltage):
         equations.append(
@@ -128,14 +111,6 @@ def find_number_of_lowest_button_presses_for_joltage(
                          for button in buttons_having_index(i, all_buttons)),
                      jolt)
             )
-    A_eq, b_eq = sympy.linear_eq_to_matrix(equations, x)
-    conditions = ([v(button) >= 0 for button in all_buttons]
-                  + [v(button) <= max_press_for_button(joltage, button)
-                     for button in all_buttons])
-    ## these don't seem to work either
-    ## so let's write our own linear optimization method
-    #return sympy.solvers.lpmin(expression, equations+conditions)[0]
-    #return sympy.solvers.linprog(c, A_eq=A_eq, b_eq=b_eq)[0]
     sols = sympy.solve(equations, variables, dict=True)
     ## this should be guaranteed by sympy.solve....
     assert len(sols) == 1
