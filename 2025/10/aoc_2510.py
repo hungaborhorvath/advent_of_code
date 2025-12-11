@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import sys
+from typing import Union
+from itertools import chain, combinations, product
+from collections import Counter
+import sympy
+
+
+## https://docs.python.org/3/library/itertools.html
+def powerset(iterable):
+    "Subsequences of the iterable from shortest to longest."
+    # powerset([1,2,3]) → () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+
+def parse_input(input_data:str) -> list[str]:
+    lines = [line for line in input_data.split('\n') if line]
+    return lines
+
+def parse_lights(s:str) -> set[int]:
+    lights = set([])
+    for i in range(len(s)):
+        if s[i] == '#':
+            lights.add(i)
+    return lights
+
+def parse_button(s:str) -> tuple[int, ...]:
+    t = tuple(int(nr) for nr in s.split(','))
+    return t
+
+def parse_joltage(s:str) -> list[int]:
+    l = [int(nr) for nr in s.split(',')]
+    return l
+
+def parse_atom(s:str) -> Union[set[int], tuple[int, ...], list[int]]:
+    parentheses = (s[0], s[-1])
+    if parentheses == ('[', ']'):
+        return parse_lights(s[1:-1])
+    elif parentheses == ('(', ')'):
+        return parse_button(s[1:-1])
+    elif parentheses == ('{', '}'):
+        return parse_joltage(s[1:-1])
+
+def parse_line(line:str) -> tuple[set[int], list[list[int]], list[int]]:
+    l = [parse_atom(atom) for atom in line.split()]
+    return l[0], list(l[1:-1]), l[-1]
+
+
+def press_buttons(buttons:list[tuple[int, ...]]):
+    lights = Counter(sum([list(button) for button in buttons], []))
+    return set([light for light in lights.keys() if lights[light] % 2])
+
+
+def find_number_of_lowest_button_presses_for_lights(
+        lights:set[int],
+        all_buttons:list[tuple[int, ...]]
+        ) -> int:
+    for buttons in powerset(all_buttons):
+        if press_buttons(buttons) == lights:
+            return len(buttons)
+
+
+def buttons_having_index(
+        i:int,
+        buttons:list[tuple[int, ...]]
+        ) -> list[tuple[int, ...]]:
+    return [button for button in buttons if i in button]
+
+def max_press_for_button(
+        joltage:list[int],
+        button:tuple[int, ...]
+        ) -> int:
+    return min(joltage[i] for i in button)
+
+def matrix_for_buttons(
+        joltage:list[int],
+        all_buttons:tuple[int, ...]
+        ) -> list[list[int]]:
+    length = len(joltage)
+    matrix = []
+    for button in all_buttons:
+        row = []
+        for i in range(length):
+            if i in button:
+                row.append(1)
+            else:
+                row.append(0)
+        matrix.append(row)
+    return matrix
+
+
+def v(t:tuple) -> sympy.Symbol:
+    return sympy.Symbol('v_' + str(t), integer=True)
+
+
+## apparently this doesn't work, need to check with sympy devs
+def linear_program_for_joltage(
+        joltage:list[int],
+        all_buttons:list[tuple[int, ...]]
+        ) -> int:
+    x = [v(button) for button in all_buttons]
+    c = [1 for button in all_buttons]
+    A_eq = sympy.Matrix(matrix_for_buttons(joltage, all_buttons))
+    b_eq = joltage
+    bounds = {i: (0, max_press_for_button(joltage, button))
+              for (i, button) in enumerate(all_buttons)}
+    return sympy.solvers.linprog(c=c, A_eq=A_eq, b_eq=b_eq,
+                                 bounds=bounds)
+    
+
+def find_number_of_lowest_button_presses_for_joltage(
+        joltage:list[int],
+        all_buttons:list[tuple[int, ...]],
+        use_heuristic=True,
+        ) -> int:
+    x = [v(button) for button in all_buttons]
+    variables = [v(button)
+                 for button in sorted(all_buttons, key=len, reverse=True)]
+    expression = sum(x)
+    c = sympy.linear_eq_to_matrix(expression, x)[0]
+    equations = []
+    for i, jolt in enumerate(joltage):
+        equations.append(
+            sympy.Eq(sum(v(button)
+                         for button in buttons_having_index(i, all_buttons)),
+                     jolt)
+            )
+    A_eq, b_eq = sympy.linear_eq_to_matrix(equations, x)
+    conditions = ([v(button) >= 0 for button in all_buttons]
+                  + [v(button) <= max_press_for_button(joltage, button)
+                     for button in all_buttons])
+    ## these don't seem to work either
+    ## so let's write our own linear optimization method
+    #return sympy.solvers.lpmin(expression, equations+conditions)[0]
+    #return sympy.solvers.linprog(c, A_eq=A_eq, b_eq=b_eq)[0]
+    sols = sympy.solve(equations, variables, dict=True)
+    ## this should be guaranteed by sympy.solve....
+    assert len(sols) == 1
+    sol = sols[0]
+    free_variables = tuple(sympy.Tuple(*tuple(sol.values())).atoms(*variables))
+
+    bounds = {v(button): max_press_for_button(joltage, button)
+              for button in all_buttons}
+    l = list(product(*[range(bounds[variable])
+                       for variable in free_variables]))
+
+    new_expression = expression.xreplace(sol)
+    def expression_for_value(values:tuple[int, ...]) -> bool:
+        subs = {variable: values[i]
+                for i, variable in enumerate(free_variables)}
+        return new_expression.xreplace(subs)
+    new_l = sorted(l, key=expression_for_value) if use_heuristic else l
+
+    all_valid_solutions = []
+    for values in new_l:
+        subs = {variable: values[i]
+                for i, variable in enumerate(free_variables)}
+        new_sol = {variable: solution.xreplace(subs)
+                   for variable, solution in sol.items()}
+        new_sol.update(subs)
+        if all(((isinstance(value, sympy.Integer) or (isinstance(value, int)))
+                and value >= 0)
+               for value in new_sol.values()):
+            all_valid_solutions.append(new_sol)
+            if use_heuristic:
+                break
+    return min(sum(solution.values()) for solution in all_valid_solutions)
+
+
+def main(file_name:str) -> tuple[int, int]:
+    with open(file_name) as input_file:
+        input_data = input_file.read()
+    lines = parse_input(input_data)
+    machines = [parse_line(line) for line in lines]
+    lowest_number_of_presses_for_lights = [
+        find_number_of_lowest_button_presses_for_lights(machine[0], machine[1])
+        for machine in machines
+        ]
+    lowest_number_of_presses_for_joltage = [
+        find_number_of_lowest_button_presses_for_joltage(machine[2], machine[1])
+        for machine in machines
+        ]
+    answer = (sum(lowest_number_of_presses_for_lights),
+              sum(lowest_number_of_presses_for_joltage))
+    return answer
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[-1]))
