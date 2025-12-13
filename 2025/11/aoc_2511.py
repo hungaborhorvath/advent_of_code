@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import functools
 import itertools
 import math
 import networkx as nx
@@ -26,6 +27,15 @@ def input_graph(lines:list[str]) -> nx.DiGraph:
     return dg
 
 
+@functools.cache
+def number_of_path_between(dg:nx.DiGraph, start:str, end:str) -> int:
+    if start == end:
+        return 1
+    else:
+        return sum(number_of_path_between(dg, start, v)
+                   for v in dg.predecessors(end))
+
+
 def path_can_be_fulfilled(dg:nx.DiGraph, path:list[str]) -> bool:
     return all(path[i+1] in nx.descendants(dg, path[i])
                for i in range(len(path)-1))
@@ -46,8 +56,11 @@ def number_of_all_valid_path(dg:nx.DiGraph, start:str, end:str,
         path.append(end)
         if path_can_be_fulfilled(dg, path):
             s += math.prod([
-                len(list(nx.all_simple_paths(
-                    component_between(dg, path[i], path[i+1]), path[i], path[i+1])))
+                number_of_path_between(
+                    component_between(dg, path[i], path[i+1]),
+                    path[i],
+                    path[i+1]
+                    )
                 for i in range(len(path)-1)
                 ])
     return s
@@ -58,8 +71,7 @@ def main(file_name:str) -> tuple[int, int]:
         input_data = input_file.read()
     lines = parse_input(input_data)
     dg = input_graph(lines)
-    all_paths_from_you_to_out = list(nx.all_simple_paths(dg, 'you', 'out'))
-    answer = (len(all_paths_from_you_to_out),
+    answer = (number_of_path_between(dg, 'you', 'out'),
               number_of_all_valid_path(dg, 'svr', 'out', ['dac', 'fft']))
     return answer
 
