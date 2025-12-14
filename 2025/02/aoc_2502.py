@@ -54,7 +54,7 @@ def all_invalid_ids_in_input(ranges:list) -> list[int]:
 
 
 def main(file_name: str):
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     ranges = parse_input(input_data)
     invalid_ids = invalid_ids_in_input(ranges)

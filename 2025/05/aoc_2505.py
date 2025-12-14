@@ -70,7 +70,7 @@ def number_of_all_fresh_ids(disjoint_intervals:set[tuple[int, int]]) -> int:
 
 
 def main(file_name:str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     intervals, ids = parse_input(input_data)
     fresh_ids = [id for id in ids if is_fresh_id(id, intervals)]

@@ -26,7 +26,7 @@ def max_k_digit_number_in_bank(bank:list[int], digits:int =2) -> int:
 
 
 def main(file_name:str):
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     banks = parse_input(input_data)
     joltages = [

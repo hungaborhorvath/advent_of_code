@@ -49,7 +49,7 @@ def number_of_removeable_rolls(rolls:list[list[bool]]) -> int:
 
 
 def main(file_name:str):
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     rolls = parse_input(input_data)
     answer = (len(accessible_rolls(rolls)), number_of_removeable_rolls(rolls))

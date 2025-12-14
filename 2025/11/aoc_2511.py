@@ -67,7 +67,7 @@ def number_of_all_valid_path(dg:nx.DiGraph, start:str, end:str,
 
 
 def main(file_name:str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     lines = parse_input(input_data)
     dg = input_graph(lines)

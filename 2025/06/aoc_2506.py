@@ -51,7 +51,7 @@ def do_operations_on_numbers(columns:list[list[int]],
 
 
 def main(file_name:str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     numbers, operations = parse_input(input_data)
     number_lines = parse_input_for_part_two(input_data)

@@ -31,7 +31,7 @@ def compute_beam_timelines_and_splits(
 
 
 def main(file_name:str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     lines = parse_input(input_data)
     timelines, splits = compute_beam_timelines_and_splits(lines)

@@ -146,7 +146,7 @@ def find_number_of_lowest_button_presses_for_joltage(
 
 
 def main(file_name:str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     lines = parse_input(input_data)
     machines = [parse_line(line) for line in lines]

@@ -55,7 +55,7 @@ def last_point_pair_for_connected_graph(
 
 
 def main(file_name:str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     points = parse_input(input_data)
     number_of_edges = 10 if len(points) == 20 else 1000

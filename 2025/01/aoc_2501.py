@@ -53,7 +53,7 @@ def number_of_zeros(numbers:list[int], start:int =START,
 
 
 def main(file_name: str):
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     numbers = parse_input(input_data)
     dial_sequence = dial_states(numbers)

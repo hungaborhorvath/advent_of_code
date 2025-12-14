@@ -48,7 +48,7 @@ def parse_input(input_data:str) -> tuple[list[Shape], list[Region]]:
 
 
 def main(file_name:str) -> tuple[int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     shapes, regions = parse_input(input_data)
     ## exclude regions which are trivially impossible to fit by size

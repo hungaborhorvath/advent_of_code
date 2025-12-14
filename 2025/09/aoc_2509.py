@@ -75,7 +75,7 @@ def find_largest_green_rectangle_by_area(
 
 
 def main(file_name:str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     red_tiles = parse_input(input_data)
     answer = (area(find_largest_rectangle_by_area(red_tiles)),
