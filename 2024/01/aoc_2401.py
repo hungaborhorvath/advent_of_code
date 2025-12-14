@@ -19,7 +19,7 @@ def differences(l1: list[int], l2: list[int]) -> list[int]:
 def similarity_score(l1: list[int], l2: list[int]) -> int:
     return sum(a*l2.count(a) for a in l1)
 
-def main(file_name: str):
+def main(file_name: str) -> tuple[int, int]:
     with open(file_name) as input_file:
         input_data = input_file.read()
     l1, l2 = parse_input(input_data)
@@ -27,5 +27,4 @@ def main(file_name: str):
     return answer
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[-1]))
-
+    print(main(sys.argv[-1]))

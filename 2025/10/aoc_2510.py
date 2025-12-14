@@ -163,4 +163,4 @@ def main(file_name:str) -> tuple[int, int]:
     return answer
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[-1]))
+    print(main(sys.argv[-1]))

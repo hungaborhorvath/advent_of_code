@@ -48,7 +48,7 @@ def number_of_removeable_rolls(rolls:list[list[bool]]) -> int:
     return s
 
 
-def main(file_name:str):
+def main(file_name:str) -> tuple[int, int]:
     with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     rolls = parse_input(input_data)
@@ -56,4 +56,4 @@ def main(file_name:str):
     return answer
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[-1]))
+    print(main(sys.argv[-1]))
