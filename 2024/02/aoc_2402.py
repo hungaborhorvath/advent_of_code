@@ -9,9 +9,9 @@ def parse_input(input_data: str) -> list[list[int]]:
     return [[int(s) for s in report] for report in reports]
 
 def is_safe(report: list[int]) -> bool:
-    if not (sorted(report) == report or sorted(report, reverse=True) == report):
+    if not (sorted(report) == report
+            or sorted(report, reverse=True) == report):
         return False
-    safe = True
     differences = [report[i+1] - report[i] for i in range(len(report)-1)]
     return set(differences).issubset(set([-3, -2, -1, 1, 2, 3]))
 
