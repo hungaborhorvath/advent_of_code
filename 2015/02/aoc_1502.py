@@ -23,7 +23,7 @@ def ribbon(sides: list[int]) -> int:
     return present + bow
 
 def main(file_name: str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     dimensions = parse_input(input_data)
     answer = (sum(wrapping_paper(sides) for sides in dimensions),

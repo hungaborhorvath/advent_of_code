@@ -19,7 +19,7 @@ def is_safe_by_removing_one_element(report: list[int]) -> bool:
     return any(is_safe(report[:i] + report[i+1:]) for i in range(len(report)))
 
 def main(file_name: str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     reports = parse_input(input_data)
     reports_is_safe = [is_safe(report) for report in reports]

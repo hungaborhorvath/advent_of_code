@@ -18,7 +18,7 @@ def floor_counter(input_data: str) -> tuple[int, int]:
     return (s, pos)
 
 def main(file_name: str) -> tuple[int, int]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding="utf-8") as input_file:
         input_data = input_file.read()
     answer = floor_counter(input_data)
     return answer
