@@ -33,20 +33,22 @@ def parse_input(input_data:str) -> list[Point]:
 
 def graph_from_points(points:list[Point],
                       number_of_edges:int) -> nx.Graph:
-    G = nx.Graph()
+    G = nx.Graph() # type:nx.Graph
     G.add_nodes_from(points)
     point_pairs = list(itertools.combinations(points, 2))
-    ordered_point_pairs = sorted(point_pairs, key=distance_square_between_points)
+    ordered_point_pairs = sorted(point_pairs,
+                                 key=distance_square_between_points)
     G.add_edges_from(ordered_point_pairs[:number_of_edges])
     return G
 
 def last_point_pair_for_connected_graph(
         points:list[Point]
         ) -> tuple[Point, Point]:
-    G = nx.Graph()
+    G = nx.Graph() # type:nx.Graph
     G.add_nodes_from(points)
     point_pairs = list(itertools.combinations(points, 2))
-    ordered_point_pairs = sorted(point_pairs, key=distance_square_between_points)
+    ordered_point_pairs = sorted(point_pairs,
+                                 key=distance_square_between_points)
     i = -1
     while not nx.is_connected(G):
         i += 1
@@ -60,7 +62,7 @@ def main(file_name:str) -> tuple[int, int]:
     points = parse_input(input_data)
     number_of_edges = 10 if len(points) == 20 else 1000
     G = graph_from_points(points, number_of_edges)
-    components = [c for c in nx.connected_components(G)]
+    components = list(nx.connected_components(G))
     ordered_components = sorted(components, key=len, reverse=True)
     (p, q) = last_point_pair_for_connected_graph(points)
     answer = (math.prod(len(c) for c in ordered_components[:3]), p.x * q.x)

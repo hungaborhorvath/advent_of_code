@@ -12,10 +12,10 @@ def parse_input(input_data:str) -> tuple[list[tuple[int, int]], list[int]]:
     return (intervals_int, ids_int)
 
 
-def is_fresh_id(id:int, intervals:list[tuple[int, int]]) -> bool:
+def is_fresh_id(ingredient_id:int, intervals:list[tuple[int, int]]) -> bool:
     fresh = False
     for (a, b) in intervals:
-        if a <= id and id <= b:
+        if a <= ingredient_id <= b:
             fresh = True
             break
     return fresh
@@ -31,7 +31,8 @@ def all_fresh_ids_slow(intervals:list[tuple[int, int]]) -> set[int]:
 
 
 def have_intersection_with(interval:tuple[int, int],
-                           intervals:set[tuple[int, int]]) -> list[tuple[int, int]]:
+                           intervals:set[tuple[int, int]]
+                           ) -> list[tuple[int, int]]:
     (x, y) = interval
     has_intersection = set([])
     for (a, b) in intervals:
@@ -45,8 +46,8 @@ def add_new_interval(interval:tuple[int, int],
     has_intersection = have_intersection_with((x, y), disjoint_intervals)
     if has_intersection:
         new_disjoint_intervals = disjoint_intervals.copy()
-        for interval in has_intersection:
-            new_disjoint_intervals.remove(interval)
+        for id_interval in has_intersection:
+            new_disjoint_intervals.remove(id_interval)
         has_intersection.append((x, y))
         start = min(interval[0] for interval in has_intersection)
         end = max(interval[1] for interval in has_intersection)
@@ -55,7 +56,9 @@ def add_new_interval(interval:tuple[int, int],
         new_disjoint_intervals = disjoint_intervals.union(set([(x, y)]))
     return new_disjoint_intervals
 
-def all_disjoint_intervals(intervals:list[tuple[int, int]]) -> set[tuple[int, int]]:
+def all_disjoint_intervals(
+        intervals:list[tuple[int, int]]
+        ) -> set[tuple[int, int]]:
     all_intervals = set([]) # type:set[tuple[int, int]]
     for interval in intervals:
         all_intervals = add_new_interval(interval, all_intervals)

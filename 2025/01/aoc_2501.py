@@ -39,7 +39,7 @@ def number_of_zeros(numbers:list[int], start:int =START,
     count_of_zeros = 0
     for n in numbers:
         new_dial = dial + n
-        hundreds = (new_dial // dial_size)
+        hundreds = new_dial // dial_size
         count_of_zeros += abs(hundreds)
         if new_dial <= 0:
             ## if we started from 0 and went negative, then we overcounted by 1

@@ -16,30 +16,30 @@ def parse_input_for_part_two(input_data:str) -> list[str]:
     return lines[:-1]
 
 
-def length_of_columns(columns:list[list[int]]) -> list[int]:
-    return [max([len(str(n)) for n in column]) for column in columns]
+def length_of_columns(columns:list[tuple[int, ...]]) -> list[int]:
+    return [max(len(str(n)) for n in column) for column in columns]
 
 def create_columns_for_second_part(number_lines:list[str],
-                                   lengths:list[int]) -> list[list[int]]:
+                                   lengths:list[int]) -> list[tuple[int, ...]]:
     columns = []
     start = 0
     for length in lengths:
         end = start + length
         column_str = [number_line[start:end] for number_line in number_lines]
         column = [int(''.join(t)) for t in list(zip(*column_str))]
-        columns.append(column)
+        columns.append(tuple(column))
         start = end+1
     return columns
 
 
-def add(column:list[int]) -> int:
+def add(column:tuple[int, ...]) -> int:
     return sum(column)
 
-def multiply(column:list[int]) -> int:
+def multiply(column:tuple[int, ...]) -> int:
     return math.prod(column)
 
 
-def do_operations_on_numbers(columns:list[list[int]],
+def do_operations_on_numbers(columns:list[tuple[int, ...]],
                              operations:list[str]) -> list[int]:
     results = []
     for i, column in enumerate(columns):

@@ -19,7 +19,7 @@ def parse_line(line:str) -> tuple[str, list[str]]:
     return (start, ends)
 
 def input_graph(lines:list[str]) -> nx.DiGraph:
-    dg = nx.DiGraph()
+    dg = nx.DiGraph() # type:nx.DiGraph
     for line in lines:
         start, ends = parse_line(line)
         edges = [(start, end) for end in ends]
@@ -31,9 +31,8 @@ def input_graph(lines:list[str]) -> nx.DiGraph:
 def number_of_path_between(dg:nx.DiGraph, start:str, end:str) -> int:
     if start == end:
         return 1
-    else:
-        return sum(number_of_path_between(dg, start, v)
-                   for v in dg.predecessors(end))
+    return sum(number_of_path_between(dg, start, v)
+               for v in dg.predecessors(end))
 
 
 def path_can_be_fulfilled(dg:nx.DiGraph, path:list[str]) -> bool:

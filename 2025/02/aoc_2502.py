@@ -4,7 +4,7 @@
 import sys
 
 
-def parse_input(input_data: str) -> list[tuple[int, int]]:
+def parse_input(input_data: str) -> list[tuple[int, ...]]:
     ranges = []
     for range_string in input_data.split(','):
         ranges.append(tuple(int(n) for n in range_string.split('-')))
@@ -16,10 +16,9 @@ def is_invalid_id(n: int, d:int =2) -> bool:
     length = len(s)
     if length % d != 0:
         return False
-    else:
-        pattern_length = length // d
-        return len(set(s[i*pattern_length:(i+1)*pattern_length]
-                       for i in range(d))) == 1
+    pattern_length = length // d
+    return len(set(s[i*pattern_length:(i+1)*pattern_length]
+                   for i in range(d))) == 1
 
 
 def invalid_ids_in_range(start:int, end:int) -> list[int]:

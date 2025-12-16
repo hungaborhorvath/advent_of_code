@@ -6,17 +6,22 @@ import sys
 
 def parse_input(input_data:str) -> list[list[bool]]:
     lines = [line for line in input_data.split('\n') if line]
-    rolls = [[True if s == '@' else False for s in line] for line in lines]
+    rolls = [[s == '@' for s in line] for line in lines]
     return rolls
 
 
-def accessible_roll(rolls:list[list[bool]], i:int, j:int, maxi:int, maxj:int,
-                    mini=0, minj=0) -> bool:
+def accessible_roll(rolls:list[list[bool]],
+                    coords:tuple[int, int],
+                    max_coords:tuple[int, int],
+                    min_coords:tuple[int, int] =(0, 0)) -> bool:
+    i, j = coords
+    maxi, maxj = max_coords
+    mini, minj = min_coords
     neighbors = [(i-1, j-1), (i-1, j), (i-1, j+1), (i, j-1), (i, j+1),
                   (i+1, j-1), (i+1, j), (i+1, j+1)]
     valid_neighbors = [(k, l) for (k, l) in neighbors
-                       if (k >= mini and k < maxi)
-                       and (l >= minj and l < maxj)]
+                       if (mini <= k < maxi)
+                       and (minj <= l < maxj)]
     valid_neighbor_rolls = [(k, l) for (k, l) in valid_neighbors
                             if rolls[k][l]]
     return rolls[i][j] and len(valid_neighbor_rolls) < 4
@@ -27,7 +32,7 @@ def accessible_rolls(rolls) -> list[tuple[int, int]]:
     l = []
     for i in range(maxi):
         for j in range(maxj):
-            if accessible_roll(rolls, i, j, maxi, maxj):
+            if accessible_roll(rolls, (i, j), (maxi, maxj)):
                 l.append((i, j))
     return l
 

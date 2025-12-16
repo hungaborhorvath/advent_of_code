@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from typing import Union
+from typing import cast, Optional, Union
 from itertools import chain, combinations, product
 from collections import Counter
 import sympy
@@ -22,8 +22,8 @@ def parse_input(input_data:str) -> list[str]:
 
 def parse_lights(s:str) -> set[int]:
     lights = set([])
-    for i in range(len(s)):
-        if s[i] == '#':
+    for i, c in enumerate(s):
+        if c == '#':
             lights.add(i)
     return lights
 
@@ -35,37 +35,51 @@ def parse_joltage(s:str) -> list[int]:
     l = [int(nr) for nr in s.split(',')]
     return l
 
-def parse_atom(s:str) -> Union[set[int], tuple[int, ...], list[int]]:
+def parse_atom(s:str) -> Optional[Union[set[int], tuple[int, ...], list[int]]]:
     parentheses = (s[0], s[-1])
     if parentheses == ('[', ']'):
         return parse_lights(s[1:-1])
-    elif parentheses == ('(', ')'):
+    if parentheses == ('(', ')'):
         return parse_button(s[1:-1])
-    elif parentheses == ('{', '}'):
+    if parentheses == ('{', '}'):
         return parse_joltage(s[1:-1])
+    return None
 
-def parse_line(line:str) -> tuple[set[int], list[list[int]], list[int]]:
+def parse_line(line:str) -> tuple[set[int],
+                                  tuple[tuple[int, ...], ...],
+                                  list[int]]:
     l = [parse_atom(atom) for atom in line.split()]
-    return l[0], list(l[1:-1]), l[-1]
+    lights, all_buttons, joltage = l[0], l[1:-1], l[-1]
+    ## these typings are actually based on assumption on the input
+    lights_with_correct_type = cast(set[int], lights)
+    all_buttons_with_correct_type = cast(tuple[tuple[int, ...], ...],
+                                         all_buttons)
+    joltage_with_correct_type = cast(list[int], joltage)
+    return (lights_with_correct_type, all_buttons_with_correct_type,
+            joltage_with_correct_type)
 
 
 def press_buttons(buttons:list[tuple[int, ...]]):
     lights = Counter(sum([list(button) for button in buttons], []))
-    return set([light for light in lights.keys() if lights[light] % 2])
+    return set(light for light, button_count in lights.items()
+                     if button_count % 2)
 
 
 def find_number_of_lowest_button_presses_for_lights(
         lights:set[int],
-        all_buttons:list[tuple[int, ...]]
+        all_buttons:tuple[tuple[int, ...], ...]
         ) -> int:
     for buttons in powerset(all_buttons):
         if press_buttons(buttons) == lights:
             return len(buttons)
+    ## this should be infinity based on the spirit of the puzzle
+    ## but we assume this is never reached for the input, anyway
+    return 0
 
 
 def buttons_having_index(
         i:int,
-        buttons:list[tuple[int, ...]]
+        buttons:tuple[tuple[int, ...], ...]
         ) -> list[tuple[int, ...]]:
     return [button for button in buttons if i in button]
 
@@ -77,13 +91,12 @@ def max_press_for_button(
 
 def matrix_for_buttons(
         joltage:list[int],
-        all_buttons:tuple[int, ...]
+        all_buttons:tuple[tuple[int, ...], ...]
         ) -> list[list[int]]:
-    length = len(joltage)
     matrix = []
     for button in all_buttons:
         row = []
-        for i in range(length):
+        for i, _ in enumerate(joltage):
             if i in button:
                 row.append(1)
             else:
@@ -98,7 +111,7 @@ def v(t:tuple) -> sympy.Symbol:
 
 def find_number_of_lowest_button_presses_for_joltage(
         joltage:list[int],
-        all_buttons:list[tuple[int, ...]],
+        all_buttons:tuple[tuple[int, ...], ...],
         use_heuristic=True,
         ) -> int:
     variables = [v(button)
@@ -122,7 +135,7 @@ def find_number_of_lowest_button_presses_for_joltage(
     l = list(product(*[range(bounds[variable])
                        for variable in free_variables]))
 
-    new_expression = expression.xreplace(sol)
+    new_expression = cast(sympy.Expr, expression).xreplace(sol)
     def expression_for_value(values:tuple[int, ...]) -> bool:
         subs = {variable: values[i]
                 for i, variable in enumerate(free_variables)}
@@ -136,8 +149,7 @@ def find_number_of_lowest_button_presses_for_joltage(
         new_sol = {variable: solution.xreplace(subs)
                    for variable, solution in sol.items()}
         new_sol.update(subs)
-        if all(((isinstance(value, sympy.Integer) or (isinstance(value, int)))
-                and value >= 0)
+        if all(isinstance(value, (sympy.Integer, int)) and value >= 0
                for value in new_sol.values()):
             all_valid_solutions.append(new_sol)
             if use_heuristic:
@@ -155,7 +167,8 @@ def main(file_name:str) -> tuple[int, int]:
         for machine in machines
         ]
     lowest_number_of_presses_for_joltage = [
-        find_number_of_lowest_button_presses_for_joltage(machine[2], machine[1])
+        find_number_of_lowest_button_presses_for_joltage(machine[2],
+                                                         machine[1])
         for machine in machines
         ]
     answer = (sum(lowest_number_of_presses_for_lights),

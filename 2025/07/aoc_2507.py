@@ -17,7 +17,7 @@ def compute_beam_timelines_and_splits(
     beam_indices = [Counter({start:1})]
     splits = 0
     ## start line is already handled
-    for i, line in enumerate(lines[1:]):
+    for line in lines[1:]:
         new_beam_indices = Counter({}) # type:Counter[int]
         for beam_index in beam_indices[-1].keys():
             if line[beam_index] == '.':
