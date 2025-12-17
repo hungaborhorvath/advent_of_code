@@ -1,0 +1,5 @@
+[SETTINGS]
+max-line-length=79
+disable =
+    invalid-name,
+    missing-docstring,
